@@ -7,7 +7,7 @@ import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react'; 
 
 const client = new ApolloClient({ 
-	uri: 'https://71z1g.sse.codesandbox.io',
+	uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswapv2',
 	cache: new InMemoryCache()
 }); 
 
