@@ -3,36 +3,38 @@ import { gql } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react'; 
 import { useQuery } from '@apollo/client'; 
 
-const EXCHANGE_RATES = gql`
-	query GetExchangeRates($currency: String!) {
-		rates(currency: $currency) {
-			rate 
+const GET_DOGS = gql`
+	{
+		dogs {
+			id 
+			breed 
 		}
 	}
 `; 
 
-const RATES = gql`
-	query GetExchangeRates {
-		rates(currency: "USD"){
-			currency 
+const GET_DOG_PHOTO = gql`
+	query dog($breed: String!) {
+		dog(breed: $breed) {
+			id 
+			displayImage 
 		}
 	}
 `; 
 
 
-function Rates({onRateSelected}) {
-	const { loading, error, data } = useQuery(RATES); 
+function Dogs({onDogSelected}) {
+	const { loading, error, data } = useQuery(GET_DOGS); 
 
 	  if (loading) return <p> LOADING </p>; 
 	  if (error) return <p> ERROR: {error} </p>; 
 	
 	  return (
 		 <div className="App">
-		 <select name="rate" onChange={onRateSelected}> 
+		 <select name="dog" onChange={onDogSelected}> 
 			{
-				data.rates.map(({currency, rate}) => (
-				<option key={currency} value={rate}> 
-					{currency}
+				data.dogs.map(dog => (
+				<option key={dog.id} value={dog.breed}> 
+					{dog.breed}
 				</option> 
 				))
 			}
@@ -41,9 +43,10 @@ function Rates({onRateSelected}) {
   );	
 }
 
-function ShowRate({currency}){
-	const { loading, error, data } = useQuery(EXCHANGE_RATES, {
-		variables: { currency }, 
+function ShowDog({breed}){
+	const { loading, error, data } = useQuery(GET_DOG_PHOTO, {
+		variables: { breed }, 
+		pollInterval: 500 //query will execute periodically at the given interval
 	}); 
 
 	console.log(data);
@@ -53,28 +56,23 @@ function ShowRate({currency}){
 
 	return (
 		<div> 
-			<h1> Rates Result: </h1>
-			<h1>
-				{
-					data
-				} 
-			</h1>	
+			<img src={data.dog.displayImage} /> 
 		</div>
 	);
 }
 
 function App() {
-  const [selectedCurrency, setSelectedCurrency] = useState(null); 
+  const [selectedDog, setSelectedDog] = useState(null); 
 
-  function onCurrencySelected({target}) {
+  function onDogSelected({target}) {
 	console.log(target.value);
-	setSelectedCurrency(target.value); 
+	setSelectedDog(target.value); 
   }
 
   return (
 	 <div className="App">
-		{selectedCurrency && <ShowRate currency={selectedCurrency} />}
-		<Rates onRateSelected={onCurrencySelected} />
+		{selectedDog && <ShowDog breed={selectedDog} />}
+		<Dogs onDogSelected={onDogSelected} />
 	</div>
   );
 }
